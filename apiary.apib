@@ -157,6 +157,10 @@ When authenticated, returns all of user's Gists. When unauthenticated, returns a
 
 A single gist object
 
++ Parameters
+
+    + id (string) ... ID of the gist in the form of a hash
+
 ## Get a single gist [GET]
 
 + Response 200 (applications/json)
@@ -342,6 +346,10 @@ A single gist object
 
 # Star [/gists/{id}/star]
 
++ Parameters
+
+    + id (string) ... ID of the gist in the form of a hash
+
 ## Star a gist [PUT]
 
 + Response 204
@@ -385,6 +393,10 @@ A single gist object
             .
 
 # Forks [/gists/{id}/forks]
+
++ Parameters
+
+    + id (string) ... ID of the gist in the form of a hash
 
 ## Fork a gist [POST]
 
