@@ -3,11 +3,21 @@ FORMAT: 1A
 # Gists API
 REST API for GitHub Gists. Original [here](http://developer.github.com/v3/gists/)
 
-# Gists [/gists]
+## Authentication
+
+You can read public gists and create them for anonymous users without a token; however, to read or write gists on a user’s behalf the **gist** [oAuth scope](http://developer.github.com/v3/oauth/#scopes) is required.
+
+
+# Gists [/gists{?since}]
 A collection of gists.
 
 ## Lists Gists [GET]
 When authenticated, returns all of user's Gists. When unauthenticated, returns all public Gists.
+
++ Parameters
+
+    + since (optional, string) ... timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ Only gists updated at or after this time are returned.
+
 
 + Response 200 (application/json)
 
@@ -320,3 +330,98 @@ A single gist object
                 }
               ]
             }
+
+## Delete a gist [DELETE]
+
++ Response 204
+
+    + Headers
+    
+            X-RateLimit-Limit: 5000
+            X-RateLimit-Remaining: 4999
+
+# Star [/gists/{id}/star]
+
+## Star a gist [PUT]
+
++ Response 204
+
+    + Headers
+    
+            X-RateLimit-Limit: 5000
+            X-RateLimit-Remaining: 4999
+
+## Unstar a gist [DELETE]
+
++ Response 204
+
+    + Headers
+    
+            X-RateLimit-Limit: 5000
+            X-RateLimit-Remaining: 4999
+
+## Check if a gist is starred [GET]
+
++ Response 204
+    
+    Response if gist is starred
+
+    + Headers
+    
+            X-RateLimit-Limit: 5000
+            X-RateLimit-Remaining: 4999
+
++ Response 404
+    
+    Response if gist is **not** starred
+
+    + Headers
+    
+            X-RateLimit-Limit: 5000
+            X-RateLimit-Remaining: 4999
+
+    + Body
+    
+            .
+
+# Forks [/gists/{id}/forks]
+
+## Fork a gist [POST]
+
++ Response 201
+
+    + Headers
+    
+            Status: 201 Created
+            Location: https://api.github.com/gists/2
+            X-RateLimit-Limit: 5000
+            X-RateLimit-Remaining: 4999
+    
+    + Body
+
+            {
+              "url": "https://api.github.com/gists/1c34d10b7f3cf2de3be2",
+              "id": "1",
+              "description": "description of gist",
+              "public": true,
+              "user": {
+                "login": "octocat",
+                "id": 1,
+                "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+                "gravatar_id": "somehexcode",
+                "url": "https://api.github.com/users/octocat"
+              },
+              "files": {
+                "ring.erl": {
+                  "size": 932,
+                  "filename": "ring.erl",
+                  "raw_url": "https://gist.github.com/raw/365370/8c4d2d43d178df44f4c03a7f2ac0ff512853564e/ring.erl"
+                }
+              },
+              "comments": 0,
+              "comments_url": "https://api.github.com/gists/a339d35685cd11a4d890/comments/",
+              "html_url": "https://gist.github.com/1",
+              "git_pull_url": "git://gist.github.com/1.git",
+              "git_push_url": "git@gist.github.com:1.git",
+              "created_at": "2010-04-14T02:15:15Z"
+             }
