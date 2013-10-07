@@ -238,7 +238,7 @@ A single gist object
     *NOTE:* All files from the previous version of the gist are carried over by default if not included in the hash. Deletes can be performed by including the filename with a null hash.
     
     + Parameters
-    
+
         + description (optional, string)
         + files (optional, hash) ... Files that make up this gist. The key of which should be an *optional* **string** filename and the value another *optional* **hash** with parameters:
             + content (optional, string) ... Updated file contents.
@@ -404,7 +404,6 @@ A single gist object
 
     + Headers
     
-            Status: 201 Created
             Location: https://api.github.com/gists/2
             X-RateLimit-Limit: 5000
             X-RateLimit-Remaining: 4999
