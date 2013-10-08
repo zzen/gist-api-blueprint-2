@@ -22,13 +22,13 @@ When authenticated, returns all of user's Gists. When unauthenticated, returns a
 + Response 200 (application/json)
 
     + Headers
-        
+
             Link: <https://api.github.com/resource?page=2>; rel="next", <https://api.github.com/resource?page=5>; rel="last"
             X-RateLimit-Limit: 5000
             X-RateLimit-Remaining: 4999
 
     + Body
-    
+
             [
               {
                 "url": "https://api.github.com/gists/1c34d10b7f3cf2de3be2",
@@ -65,12 +65,12 @@ When authenticated, returns all of user's Gists. When unauthenticated, returns a
     Note: Don’t name your files “gistfile” with a numerical suffix. This is the format of the automatic naming scheme that Gist uses internally.
 
     + Parameters
-        
+
         + description (optional, string, `the description for this gist`)
         + public (boolean, `true`)
         + files (hash) ... Files that make up this gist. The key of which should be a *required* **string** filename and the value another *required* **hash** with parameters.
         + content (string) ... File contents.
-    
+
     + Body
 
             {
@@ -86,11 +86,11 @@ When authenticated, returns all of user's Gists. When unauthenticated, returns a
 + Response 201 (application/json)
 
     + Headers
-    
+
             Location: https://api.github.com/gists/1
             X-RateLimit-Limit: 5000
             X-RateLimit-Remaining: 4999
-    
+
     + Body
 
             {
@@ -166,12 +166,12 @@ A single gist object
 + Response 200 (applications/json)
 
     + Headers
-    
+
             X-RateLimit-Limit: 5000
             X-RateLimit-Remaining: 4999
 
     + Body
-        
+
             {
               "url": "https://api.github.com/gists/1c34d10b7f3cf2de3be2",
               "id": "1",
@@ -236,17 +236,17 @@ A single gist object
 + Request
 
     *NOTE:* All files from the previous version of the gist are carried over by default if not included in the hash. Deletes can be performed by including the filename with a null hash.
-    
+
     + Parameters
-    
+
         + description (optional, string)
         + files (optional, hash) ... Files that make up this gist. The key of which should be an *optional* **string** filename and the value another *optional* **hash** with parameters:
             + content (optional, string) ... Updated file contents.
             + filename (optional, string) ... New name for this file.
 
-    
+
     + Body
-    
+
             {
               "description": "the description for this gist",
               "files": {
@@ -270,10 +270,10 @@ A single gist object
 + Response 200 (application/json)
 
     + Headers
-    
+
             X-RateLimit-Limit: 5000
             X-RateLimit-Remaining: 4999
-    
+
     + Body
 
             {
@@ -340,7 +340,7 @@ A single gist object
 + Response 204
 
     + Headers
-    
+
             X-RateLimit-Limit: 5000
             X-RateLimit-Remaining: 4999
 
@@ -355,7 +355,7 @@ A single gist object
 + Response 204
 
     + Headers
-    
+
             X-RateLimit-Limit: 5000
             X-RateLimit-Remaining: 4999
 
@@ -364,32 +364,32 @@ A single gist object
 + Response 204
 
     + Headers
-    
+
             X-RateLimit-Limit: 5000
             X-RateLimit-Remaining: 4999
 
 ## Check if a gist is starred [GET]
 
 + Response 204
-    
+
     Response if gist is starred
 
     + Headers
-    
+
             X-RateLimit-Limit: 5000
             X-RateLimit-Remaining: 4999
 
 + Response 404
-    
+
     Response if gist is **not** starred
 
     + Headers
-    
+
             X-RateLimit-Limit: 5000
             X-RateLimit-Remaining: 4999
 
     + Body
-    
+
             .
 
 # Forks [/gists/{id}/forks]
@@ -403,12 +403,12 @@ A single gist object
 + Response 201
 
     + Headers
-    
+
             Status: 201 Created
             Location: https://api.github.com/gists/2
             X-RateLimit-Limit: 5000
             X-RateLimit-Remaining: 4999
-    
+
     + Body
 
             {
