@@ -3,10 +3,8 @@ gist-api-blueprint
 
 Install
 -------------
-```
-npm install
-```
-Until (if ever) this is published as a npm package, just install using npm install. This will download all dependencies and generate a apiary.ast.json in your root folder.
+`npm install` - download all dependencies and generate a apiary.ast.json in your root folder
+`npm run-script clean` - remove all install artefacts
 
 Contents
 --------
