@@ -1,7 +1,18 @@
 gist-api-blueprint
 ==================
 
-[Gist API](http://developer.github.com/v3/gists/) rewritten as an API Blueprint, [renered by Apiary here](http://docs.gistsample.apiary.io/).
+Install
+-------------
+```
+npm install
+```
+Until (if ever) this is published as a npm package, just install using npm install. This will download all dependencies and generate a apiary.ast.json in your root folder.
+
+Contents
+--------
++ `apiary.apib` - [Gist API](http://developer.github.com/v3/gists/) rewritten as an API Blueprint, [renered by Apiary here](http://docs.gistsample.apiary.io/).
++ `apiary.ast.json` - generated JSON serialization of the AST
++ `gist.api.js` - JS SDK implementation WIP
 
 
 JavaScript SDK (anticipated)

@@ -12,6 +12,10 @@
     "url": "https://github.com/zzen/gist-api-blueprint.git"
   },
   "dependencies": {
-    "request": ""
+    "request": "",
+    "coffee-script": ""
+  },
+  "scripts": {
+      "prepublish": "scripts/build"
   }
 }
