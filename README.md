@@ -8,7 +8,7 @@ Install
 
 Contents
 --------
-+ `apiary.apib` - [Gist API](http://developer.github.com/v3/gists/) rewritten as an API Blueprint, [renered by Apiary here](http://docs.gistsample.apiary.io/).
++ `apiary.apib` - [Gist API](http://developer.github.com/v3/gists/) rewritten as an API Blueprint, [rendered by Apiary here](http://docs.gistsample.apiary.io/).
 + `apiary.ast.json` - generated JSON serialization of the AST
 + `gist.api.js` - JS SDK implementation WIP
 
