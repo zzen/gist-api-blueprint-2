@@ -13,6 +13,28 @@ Contents
 + `gist.api.js` - JS SDK implementation WIP
 
 
+Opinionated API
+---------------
+The SDK makes a lot of magic happen, but for that, certain properties of the API are being assumed.
+
+##### Collections
+- there is a plural-named resource representing the collection & a corresponding singular-named resource representing the item
+- collection accepts
+     - `GET` for listing
+     - `POST` for adding new item
+     - *(optional)* `DELETE` for dropping all of the items in the collection
+- item accepts
+     - `GET` for retrieving
+     - `POST`, `PATCH` or `PUT` for overwritting
+     - `DELETE` for deleting
+- item URL is a URL template with the last parameter being ID of the item
+
+##### Actions
+TBD `/gists/{id}/fork`
+##### Properties
+TBD `/gists/{id}/star`
+
+
 JavaScript SDK (anticipated)
 ------------------------------
 
