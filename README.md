@@ -29,6 +29,11 @@ The SDK makes a lot of magic happen, but for that, certain properties of the API
      - `DELETE` for deleting
 - item URL is a URL template with the last parameter being ID of the item
 
+##### Actions
+TBD `/gists/{id}/fork`
+##### Properties
+TBD `/gists/{id}/star`
+
 
 JavaScript SDK (anticipated)
 ------------------------------
