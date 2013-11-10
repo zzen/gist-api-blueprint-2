@@ -17,8 +17,8 @@ describe 'Blueprint SDK', ->
     headers = undefined
     body    = undefined
 
-    before ->
-      {headers, body} = $.gist.find()
+    before (cb) -> $.gist.find (status, response, body) ->
+      headers = response.headers; body = response.body; cb()
 
     it 'I get proper Content-Type header', ->
-      assert.equal 'application/json', headers['Content-Type']
+      assert.equal 'application/json', headers['Content-Type'] or headers['content-type']
