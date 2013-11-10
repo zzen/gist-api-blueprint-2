@@ -17,6 +17,9 @@ Opinionated API
 ---------------
 The SDK makes a lot of magic happen, but for that, certain properties of the API are being assumed.
 
+##### Path prefix
+- There is none. If so, it is parsed as a collection now.
+
 ##### Collections
 - there is a plural-named resource representing the collection & a corresponding singular-named resource representing the item
 - collection accepts

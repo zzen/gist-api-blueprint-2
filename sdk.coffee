@@ -13,10 +13,24 @@ Assumptions:
 
 class Blueprint
   constructor: (@bp) ->
-    @resources = [].concat.apply [], (resource.name for resource in group.resources for group in @bp.ast.resourceGroups)
-    @collections = (resource for resource in @resources when inflection.isSingular(resource) and inflection.pluralize(resource) in @resources)
-    console.log "resources: %j", @resources if VERBOSE
-    console.log "collection: %j", @collections if VERBOSE
+    @collections = []
+    availableResources = []
+
+    for g in @bp.ast.resourceGroups
+      for r in g.resources
+        availableResources.push r
+
+    for resource in availableResources
+      if resource.uriTemplate.split('/').length is 2
+        @collections.push new Collection resource, @
+
+    for collection in @collections
+      candidates = []
+      for resource in availableResources
+        if collection.prefix is resource.uriTemplate.slice 0, collection.prefix.length
+          candidates.push new Resource resource, @
+
+      collection.parseResources candidates
 
   sdk: ->
     obj = {}
@@ -26,10 +40,39 @@ class Blueprint
     return obj
 
 class Resource
-  constructor: (resource) ->
-    for action in resource.actions
-      do (action) =>
-        @[action.method.toLowerCase()] = new Action resource, action
+  constructor: (resource, @bp) ->
+    for action in resource.actions or []
+      @[action.method.toLowerCase()] = new Action resource, action
+
+    @name        = resource.name
+    @uriTemplate = resource.uriTemplate
+
+
+class Collection
+  constructor: (collection, @bp) ->
+    for action in collection.actions or []
+      @[action.method.toLowerCase()] = new Action collection, action
+
+    @name   = collection.name
+    @prefix = collection.uriTemplate
+
+  parseResources: (availableResources) ->
+    resources = []
+    for resource in availableResources
+      if @prefix is resource.uriTemplate?.split 0, @prefix.length
+        strippedTemplate = resource.uriTemplate.split 0, @prefix.length
+        try
+          parsedTemplate = utp.parse strippedTemplate
+        catch err
+          continue
+
+        console.error 'parsed', parsedTemplate
+
+        if parsedTemplate.expressions.length > 0 and parsedTemplate.expressions[0].templateText
+          resources.push resource
+
+    @resources = resources
+
 
 class Action
   constructor: (resource, action) ->
@@ -37,10 +80,11 @@ class Action
     return ->
       console.log "calling #{action.method} #{resource.uriTemplate}" if VERBOSE
       headers = {}
-      console.error 'response', response
       headers[k] = v.value for k,v of response.headers
       return headers: headers, body: response.body
 
 module.exports = {
   Blueprint
+  Collection
+  Resource
 }
