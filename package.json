@@ -13,7 +13,9 @@
   },
   "dependencies": {
     "request": "",
-    "coffee-script": ""
+    "coffee-script": "",
+    "inflection": "",
+    "uritemplate": ""
   },
   "scripts": {
       "prepublish": "scripts/build",
