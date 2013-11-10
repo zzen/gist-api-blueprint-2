@@ -4,7 +4,7 @@ inflection = require 'inflection'
 inflection.isSingular = (str) -> inflection.singularize(str) is str
 inflection.isPlural   = (str) -> inflection.pluralize(str)   is str
 
-VERBOSE = 1
+VERBOSE = !!process.env.VERBOSE
 ###
 Assumptions:
 - no multiple resources with same name
@@ -15,8 +15,8 @@ class Blueprint
   constructor: (@bp) ->
     @resources = [].concat.apply [], (resource.name for resource in group.resources for group in @bp.ast.resourceGroups)
     @collections = (resource for resource in @resources when inflection.isSingular(resource) and inflection.pluralize(resource) in @resources)
-    console.log "resources: %j", @resources
-    console.log "collection: %j", @collections
+    console.log "resources: %j", @resources if VERBOSE
+    console.log "collection: %j", @collections if VERBOSE
 
   sdk: ->
     obj = {}
@@ -27,14 +27,9 @@ class Blueprint
 
 class Resource
   constructor: (resource) ->
-    actions = (action.method for action in resource.actions)
     for action in resource.actions
       do (action) =>
-        switch action.method
-          when "GET"    then @find   = new Action resource, action
-          when "DELETE" then @remove = new Action resource, action
-          when "POST"   then @update = new Action resource, action
-          when "PATCH"  then @update = new Action resource, action
+        @[action.method.toLowerCase()] = new Action resource, action
 
 class Action
   constructor: (resource, action) ->
@@ -42,6 +37,7 @@ class Action
     return ->
       console.log "calling #{action.method} #{resource.uriTemplate}" if VERBOSE
       headers = {}
+      console.error 'response', response
       headers[k] = v.value for k,v of response.headers
       return headers: headers, body: response.body
 

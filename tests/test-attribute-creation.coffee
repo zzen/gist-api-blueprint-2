@@ -18,7 +18,7 @@ describe 'Blueprint SDK', ->
     body    = undefined
 
     before ->
-      {headers, body} = $.gist.find()
+      {headers, body} = $.gist.get()
 
     it 'I get proper Content-Type header', ->
       assert.equal 'application/json', headers['Content-Type']
