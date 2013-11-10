@@ -17,8 +17,13 @@
     "inflection": "",
     "uritemplate": ""
   },
+  "devDependencies": {
+      "chai": "",
+      "mocha": ""
+  },
   "scripts": {
       "prepublish": "scripts/build",
-      "clean": "scripts/clean"
+      "clean": "scripts/clean",
+      "test": "mocha --compilers coffee:coffee-script tests/*"
   }
 }

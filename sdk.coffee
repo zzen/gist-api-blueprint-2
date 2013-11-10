@@ -45,6 +45,6 @@ class Action
       headers[k] = v.value for k,v of response.headers
       return headers: headers, body: response.body
 
-$ = new Blueprint(bp).sdk()
-{headers, body} = $.gist.find()
-console.log "Response headers: %j, body: %s", headers, body
+module.exports = {
+  Blueprint
+}
