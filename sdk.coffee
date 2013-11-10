@@ -27,16 +27,15 @@ class Blueprint
     for collection in @collections
       candidates = []
       for resource in availableResources
-        if collection.prefix is resource.uriTemplate.slice 0, collection.prefix.length
+        if collection.prefix is resource.uriTemplate.slice(0, collection.prefix.length) and resource.uriTemplate.split('/').length > 2
           candidates.push new Resource resource, @
 
       collection.parseResources candidates
 
   sdk: ->
     obj = {}
-    for group in @bp.ast.resourceGroups
-      for resource in group.resources
-        obj[resource.name.toLowerCase()] = new Resource(resource)
+    for collection in @collections
+      obj[collection.name.toLowerCase()] = collection
     return obj
 
 class Resource
@@ -59,19 +58,23 @@ class Collection
   parseResources: (availableResources) ->
     resources = []
     for resource in availableResources
-      if @prefix is resource.uriTemplate?.split 0, @prefix.length
-        strippedTemplate = resource.uriTemplate.split 0, @prefix.length
+      if @prefix is resource.uriTemplate?.slice 0, @prefix.length
+        strippedTemplate = resource.uriTemplate.slice @prefix.length + 1 # for '/' after resource
         try
           parsedTemplate = utp.parse strippedTemplate
         catch err
           continue
-
-        console.error 'parsed', parsedTemplate
-
         if parsedTemplate.expressions.length > 0 and parsedTemplate.expressions[0].templateText
           resources.push resource
 
     @resources = resources
+    @exposeResources()
+
+  exposeResources: ->
+    for resource in @resources
+      @[resource.name.toLowerCase()] = resource
+
+
 
 
 class Action

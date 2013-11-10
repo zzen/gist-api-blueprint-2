@@ -100,7 +100,7 @@ describe 'SDK Templated resources', ->
         $ = new Blueprint(ast).sdk()
 
 
-      it 'I get it as resource attribute on SDK', ->
+      it '#now I get it as resource attribute on SDK', ->
         assert.ok $.gists.gist
 
       describe 'and I can retrieve it', ->
