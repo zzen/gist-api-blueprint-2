@@ -1,439 +1,200 @@
 FORMAT: 1A
-HOST: https://api.github.com
+HOST: http://api.gistfox.com
 
-# Gists API
-REST API for GitHub Gists. Original [here](http://developer.github.com/v3/gists/)
+# Gist Fox API
+Gist Fox API is a **pastes service** similar to [GitHub's Gist](http://gist.github.com).
 
 ## Authentication
+Currently the Gist Fox API does not provide authenticated access.
 
-You can read public gists and create them for anonymous users without a token; however, to read or write gists on a user’s behalf the **gist** [oAuth scope](http://developer.github.com/v3/oauth/#scopes) is required.
+## Media Types
+Where applicable this API uses the [HAL+JSON](https://github.com/mikekelly/hal_specification/blob/master/hal_specification.md) media-type to represent resources states and affordances.
 
+Requests with a message-body are using plain JSON to set or update resource states.
 
-# Gists [/gists?{since}]
-A collection of gists.
+## Error States
+The common [HTTP Response Status Codes](https://github.com/for-GET/know-your-http-well/blob/master/status-codes.md) are used.
 
-## Lists Gists [GET]
-When authenticated, returns all of user's Gists. When unauthenticated, returns all public Gists.
+# Gist Fox API Root [/]
+Gist Fox API entry point.
 
-+ Parameters
+This resource does not have any attributes. Instead it offers the initial API affordances in the form of the HTTP Link header and 
+HAL links.
 
-    + since (optional, string) ... timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ Only gists updated at or after this time are returned.
+## Retrieve the Entry Point [GET]
 
-
-+ Response 200 (application/json)
-
++ Response 200 (application/hal+json)
     + Headers
-
-            Link: <https://api.github.com/resource?page=2>; rel="next", <https://api.github.com/resource?page=5>; rel="last"
-            X-RateLimit-Limit: 5000
-            X-RateLimit-Remaining: 4999
+    
+            Link: <http:/api.gistfox.com/>;rel="self",<http:/api.gistfox.com/gists>;rel="gists"
 
     + Body
 
-            [
-              {
-                "url": "https://api.github.com/gists/1c34d10b7f3cf2de3be2",
-                "id": "1",
-                "description": "description of gist",
-                "public": true,
-                "user": {
-                  "login": "octocat",
-                  "id": 1,
-                  "avatar_url": "https://github.com/images/error/octocat_happy.gif",
-                  "gravatar_id": "somehexcode",
-                  "url": "https://api.github.com/users/octocat"
-                },
-                "files": {
-                  "ring.erl": {
-                    "size": 932,
-                    "filename": "ring.erl",
-                    "raw_url": "https://gist.github.com/raw/365370/8c4d2d43d178df44f4c03a7f2ac0ff512853564e/ring.erl"
-                  }
-                },
-                "comments": 0,
-                "comments_url": "https://api.github.com/gists/a339d35685cd11a4d890/comments/",
-                "html_url": "https://gist.github.com/1",
-                "git_pull_url": "git://gist.github.com/1.git",
-                "git_push_url": "git@gist.github.com:1.git",
-                "created_at": "2010-04-14T02:15:15Z"
-              }
-            ]
+            {
+                "_links": {
+                    "self": { "href": "/" },
+                    "gists": { "href": "/gists?{since}", "templated": true }
+                }
+            }
 
-## Create a Gist [POST]
+# Group Gist
+Gist-related resources of *Gist Fox API*.
+
+## Gist [/gists/{id}]
+A single Gist object. The Gist resource is the central resource in the Gist Fox API. It represents one paste - a single text note.
+
+The Gist resource has the following attributes: 
+
+- id
+- created_at
+- description
+- content
+
+The states *id* and *created_at* are assigned by the Gist Fox API at the moment of creation. 
+
+
++ Parameters
+    + id (string) ... ID of the Gist in the form of a hash.
+
++ Model (application/hal+json)
+
+    HAL+JSON representation of Gist Resource. In addition to representing its state in the JSON form it offers affordances in the form of the HTTP Link header and HAL links.
+
+    + Headers
+
+            Link: <http:/api.gistfox.com/gists/42>;rel="self", <http:/api.gistfox.com/gists/42/star>;rel="star"
+
+    + Body
+
+            {
+                "_links": {
+                    "self": { "href": "/gists/42" },
+                    "star": { "href": "/gists/42/star" },
+                },
+                "id": "42",
+                "created_at": "2014-04-14T02:15:15Z",
+                "description": "Description of Gist",
+                "content": "String contents"
+            }
+
+### Retrieve a Single Gist [GET]
++ Response 200
+    
+    [Gist][]
+
+### Edit a Gist [PATCH]
+To update a Gist send a JSON with updated value for one or more of the Gist resource attributes. All attributes values (states) from the previous version of this Gist are carried over by default if not included in the hash.
 
 + Request (application/json)
 
-    Note: Don’t name your files “gistfile” with a numerical suffix. This is the format of the automatic naming scheme that Gist uses internally.
+        {
+            "content": "Updated file contents"
+        }
 
-    + Parameters
++ Response 200
+    
+    [Gist][]
 
-        + description (optional, string, `the description for this gist`)
-        + public (boolean, `true`)
-        + files (hash) ... Files that make up this gist. The key of which should be a *required* **string** filename and the value another *required* **hash** with parameters.
-        + content (string) ... File contents.
+### Delete a Gist [DELETE]
++ Response 204
 
-    + Body
+## Gists Collection [/gists{?since}]
+Collection of all Gists.
 
-            {
-              "description": "the description for this gist",
-              "public": true,
-              "files": {
-                "file1.txt": {
-                  "content": "String file contents"
-                }
-              }
-            }
+The Gist Collection resource has the following attribute:
 
-+ Response 201 (application/json)
+- total
+
+In addition it **embeds** *Gist Resources* in the Gist Fox API.
+
+
++ Model (application/hal+json)
+
+    HAL+JSON representation of Gist Collection Resource. The Gist resources in collections are embedded. Note the embedded Gists resource are incomplete representations of the Gist in question. Use the respective Gist link to retrieve its full representation.
 
     + Headers
 
-            Location: https://api.github.com/gists/1
-            X-RateLimit-Limit: 5000
-            X-RateLimit-Remaining: 4999
+            Link: <http:/api.gistfox.com/gists>;rel="self"
 
     + Body
 
             {
-              "url": "https://api.github.com/gists/1c34d10b7f3cf2de3be2",
-              "id": "1",
-              "description": "description of gist",
-              "public": true,
-              "user": {
-                "login": "octocat",
-                "id": 1,
-                "avatar_url": "https://github.com/images/error/octocat_happy.gif",
-                "gravatar_id": "somehexcode",
-                "url": "https://api.github.com/users/octocat"
-              },
-              "files": {
-                "ring.erl": {
-                  "size": 932,
-                  "filename": "ring.erl",
-                  "raw_url": "https://gist.github.com/raw/365370/8c4d2d43d178df44f4c03a7f2ac0ff512853564e/ring.erl"
-                }
-              },
-              "comments": 0,
-              "comments_url": "https://api.github.com/gists/a339d35685cd11a4d890/comments/",
-              "html_url": "https://gist.github.com/1",
-              "git_pull_url": "git://gist.github.com/1.git",
-              "git_push_url": "git@gist.github.com:1.git",
-              "created_at": "2010-04-14T02:15:15Z",
-              "forks": [
-                {
-                  "user": {
-                    "login": "octocat",
-                    "id": 1,
-                    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
-                    "gravatar_id": "somehexcode",
-                    "url": "https://api.github.com/users/octocat"
-                  },
-                  "url": "https://api.github.com/gists/2034572bc1e182050383",
-                  "created_at": "2011-04-14T16:00:49Z"
-                }
-              ],
-              "history": [
-                {
-                  "url": "https://api.github.com/gists/b89cbe14f348fcbaf525",
-                  "version": "57a7f021a713b1c5a6a199b54cc514735d2d462f",
-                  "user": {
-                    "login": "octocat",
-                    "id": 1,
-                    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
-                    "gravatar_id": "somehexcode",
-                    "url": "https://api.github.com/users/octocat"
-                  },
-                  "change_status": {
-                    "deletions": 0,
-                    "additions": 180,
-                    "total": 180
-                  },
-                  "committed_at": "2010-04-14T02:15:15Z"
-                }
-              ]
+                "_links": {
+                    "self": { "href": "/gists" }
+                },
+                "_embedded": {
+                    "gists": [
+                        {
+                            "_links" : {
+                                "self": { "href": "/gists/42" }
+                            },
+                            "id": "42",
+                            "created_at": "2014-04-14T02:15:15Z",
+                            "description": "Description of Gist"
+                        }
+                    ]
+                },
+                "total": 1
             }
 
+### List All Gists [GET]
++ Parameters
+    + since (optional, string) ... Timestamp in ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ` Only gists updated at or after this time are returned.
 
-# Gist [/gists/{id}]
++ Response 200
 
-A single gist object
+    [Gists Collection][]
+
+### Create a Gist [POST]
+To create a new Gist simply provide a JSON hash of the *description* and *content* attributes for the new Gist. 
+
++ Request (application/json)
+
+        {
+            "description": "Description of Gist",
+            "content": "String content"
+        }
+
++ Response 201 (application/hal+json)
+
+    [Gist][]
+
+## Star [/gists/{id}/star]
+Star resource represents a Gist starred status. 
+
+The Star resource has the following attribute:
+
+- starred
+
 
 + Parameters
 
     + id (string) ... ID of the gist in the form of a hash
 
-## Get a single gist [GET]
++ Model (application/hal+json)
 
-+ Response 200 (application/json)
+    HAL+JSON representation of Star Resource.
 
     + Headers
 
-            X-RateLimit-Limit: 5000
-            X-RateLimit-Remaining: 4999
+            Link: <http:/api.gistfox.com/gists/42/star>;rel="self"
 
     + Body
 
             {
-              "url": "https://api.github.com/gists/1c34d10b7f3cf2de3be2",
-              "id": "1",
-              "description": "description of gist",
-              "public": true,
-              "user": {
-                "login": "octocat",
-                "id": 1,
-                "avatar_url": "https://github.com/images/error/octocat_happy.gif",
-                "gravatar_id": "somehexcode",
-                "url": "https://api.github.com/users/octocat"
-              },
-              "files": {
-                "ring.erl": {
-                  "size": 932,
-                  "filename": "ring.erl",
-                  "raw_url": "https://gist.github.com/raw/365370/8c4d2d43d178df44f4c03a7f2ac0ff512853564e/ring.erl"
-                }
-              },
-              "comments": 0,
-              "comments_url": "https://api.github.com/gists/a339d35685cd11a4d890/comments/",
-              "html_url": "https://gist.github.com/1",
-              "git_pull_url": "git://gist.github.com/1.git",
-              "git_push_url": "git@gist.github.com:1.git",
-              "created_at": "2010-04-14T02:15:15Z",
-              "forks": [
-                {
-                  "user": {
-                    "login": "octocat",
-                    "id": 1,
-                    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
-                    "gravatar_id": "somehexcode",
-                    "url": "https://api.github.com/users/octocat"
-                  },
-                  "url": "https://api.github.com/gists/2034572bc1e182050383",
-                  "created_at": "2011-04-14T16:00:49Z"
-                }
-              ],
-              "history": [
-                {
-                  "url": "https://api.github.com/gists/b89cbe14f348fcbaf525",
-                  "version": "57a7f021a713b1c5a6a199b54cc514735d2d462f",
-                  "user": {
-                    "login": "octocat",
-                    "id": 1,
-                    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
-                    "gravatar_id": "somehexcode",
-                    "url": "https://api.github.com/users/octocat"
-                  },
-                  "change_status": {
-                    "deletions": 0,
-                    "additions": 180,
-                    "total": 180
-                  },
-                  "committed_at": "2010-04-14T02:15:15Z"
-                }
-              ]
+                "_links": {
+                    "self": { "href": "/gists/42/star" },
+                },
+                "starred": true
             }
 
-## Edit a gist [PATCH]
-
-+ Request
-
-    *NOTE:* All files from the previous version of the gist are carried over by default if not included in the hash. Deletes can be performed by including the filename with a null hash.
-
-    + Parameters
-
-        + description (optional, string)
-        + files (optional, hash) ... Files that make up this gist. The key of which should be an *optional* **string** filename and the value another *optional* **hash** with parameters:
-            + content (optional, string) ... Updated file contents.
-            + filename (optional, string) ... New name for this file.
-
-
-    + Body
-
-            {
-              "description": "the description for this gist",
-              "files": {
-                "file1.txt": {
-                  "content": "updated file contents"
-                },
-                "old_name.txt": {
-                  "filename": "new_name.txt",
-                  "content": "modified contents"
-                },
-                "new_file.txt": {
-                  "content": "a new file"
-                },
-                "delete_this_file.txt": null
-              }
-            }
-
-
-
-
-+ Response 200 (application/json)
-
-    + Headers
-
-            X-RateLimit-Limit: 5000
-            X-RateLimit-Remaining: 4999
-
-    + Body
-
-            {
-              "url": "https://api.github.com/gists/1c34d10b7f3cf2de3be2",
-              "id": "1",
-              "description": "description of gist",
-              "public": true,
-              "user": {
-                "login": "octocat",
-                "id": 1,
-                "avatar_url": "https://github.com/images/error/octocat_happy.gif",
-                "gravatar_id": "somehexcode",
-                "url": "https://api.github.com/users/octocat"
-              },
-              "files": {
-                "ring.erl": {
-                  "size": 932,
-                  "filename": "ring.erl",
-                  "raw_url": "https://gist.github.com/raw/365370/8c4d2d43d178df44f4c03a7f2ac0ff512853564e/ring.erl"
-                }
-              },
-              "comments": 0,
-              "comments_url": "https://api.github.com/gists/a339d35685cd11a4d890/comments/",
-              "html_url": "https://gist.github.com/1",
-              "git_pull_url": "git://gist.github.com/1.git",
-              "git_push_url": "git@gist.github.com:1.git",
-              "created_at": "2010-04-14T02:15:15Z",
-              "forks": [
-                {
-                  "user": {
-                    "login": "octocat",
-                    "id": 1,
-                    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
-                    "gravatar_id": "somehexcode",
-                    "url": "https://api.github.com/users/octocat"
-                  },
-                  "url": "https://api.github.com/gists/2034572bc1e182050383",
-                  "created_at": "2011-04-14T16:00:49Z"
-                }
-              ],
-              "history": [
-                {
-                  "url": "https://api.github.com/gists/b89cbe14f348fcbaf525",
-                  "version": "57a7f021a713b1c5a6a199b54cc514735d2d462f",
-                  "user": {
-                    "login": "octocat",
-                    "id": 1,
-                    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
-                    "gravatar_id": "somehexcode",
-                    "url": "https://api.github.com/users/octocat"
-                  },
-                  "change_status": {
-                    "deletions": 0,
-                    "additions": 180,
-                    "total": 180
-                  },
-                  "committed_at": "2010-04-14T02:15:15Z"
-                }
-              ]
-            }
-
-## Delete a gist [DELETE]
-
+### Star a Gist [PUT]
 + Response 204
 
-    + Headers
-
-            X-RateLimit-Limit: 5000
-            X-RateLimit-Remaining: 4999
-
-# Star [/gists/{id}/star]
-
-+ Parameters
-
-    + id (string) ... ID of the gist in the form of a hash
-
-## Star a gist [PUT]
-
+### Unstar a Gist [DELETE]
 + Response 204
 
-    + Headers
+### Check if a Gist is Starred [GET]
++ Response 200
 
-            X-RateLimit-Limit: 5000
-            X-RateLimit-Remaining: 4999
-
-## Unstar a gist [DELETE]
-
-+ Response 204
-
-    + Headers
-
-            X-RateLimit-Limit: 5000
-            X-RateLimit-Remaining: 4999
-
-## Check if a gist is starred [GET]
-
-+ Response 204
-
-    Response if gist is starred
-
-    + Headers
-
-            X-RateLimit-Limit: 5000
-            X-RateLimit-Remaining: 4999
-
-+ Response 404
-
-    Response if gist is **not** starred
-
-    + Headers
-
-            X-RateLimit-Limit: 5000
-            X-RateLimit-Remaining: 4999
-
-    + Body
-
-            .
-
-# Forks [/gists/{id}/forks]
-
-+ Parameters
-
-    + id (string) ... ID of the gist in the form of a hash
-
-## Fork a gist [POST]
-
-+ Response 201
-
-    + Headers
-
-            Location: https://api.github.com/gists/2
-            X-RateLimit-Limit: 5000
-            X-RateLimit-Remaining: 4999
-
-    + Body
-
-            {
-              "url": "https://api.github.com/gists/1c34d10b7f3cf2de3be2",
-              "id": "1",
-              "description": "description of gist",
-              "public": true,
-              "user": {
-                "login": "octocat",
-                "id": 1,
-                "avatar_url": "https://github.com/images/error/octocat_happy.gif",
-                "gravatar_id": "somehexcode",
-                "url": "https://api.github.com/users/octocat"
-              },
-              "files": {
-                "ring.erl": {
-                  "size": 932,
-                  "filename": "ring.erl",
-                  "raw_url": "https://gist.github.com/raw/365370/8c4d2d43d178df44f4c03a7f2ac0ff512853564e/ring.erl"
-                }
-              },
-              "comments": 0,
-              "comments_url": "https://api.github.com/gists/a339d35685cd11a4d890/comments/",
-              "html_url": "https://gist.github.com/1",
-              "git_pull_url": "git://gist.github.com/1.git",
-              "git_push_url": "git@gist.github.com:1.git",
-              "created_at": "2010-04-14T02:15:15Z"
-             }
+    [Star][]
